@@ -1,0 +1,34 @@
+# Python / Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Testing / Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment & Secrets
+.env
+.env.local
+
+# Database
+*.db
+*.sqlite3
+civicpulse.db
+*.bak*
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db

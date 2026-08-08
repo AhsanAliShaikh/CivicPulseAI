@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" class="dark h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicPulse AI — AI-Powered Civic Intelligence Platform</title>
+    <meta name="description" content="CivicPulse AI empowers citizens and local government with AI-driven civic problem reporting, automated triage, priority detection, and intelligent dispatch.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        civic: {
+                            cyan: '#06b6d4',
+                            emerald: '#10b981',
+                            violet: '#8b5cf6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-brand-500 selection:text-white min-h-full flex flex-col relative overflow-x-hidden">
+
+    <!-- Background Ambient Lighting -->
+    <div class="glow-background bg-indigo-600/20 w-[600px] h-[600px] -top-40 -left-40"></div>
+    <div class="glow-background bg-cyan-600/15 w-[500px] h-[500px] top-1/3 -right-20"></div>
+    <div class="glow-background bg-violet-600/15 w-[550px] h-[550px] -bottom-40 left-1/4"></div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-slate-950/70 border-b border-slate-800/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-civic-violet to-civic-cyan p-[2px] flex items-center justify-center shadow-lg shadow-brand-500/20">
+                    <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+                        <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div>
+                    <span class="font-heading font-bold text-xl tracking-tight text-white">CivicPulse<span class="text-cyan-400">.AI</span></span>
+                    <span class="text-[10px] uppercase font-mono tracking-widest px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 ml-2">Phase 0</span>
+                </div>
+            </div>
+
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
+                <a href="#features" class="hover:text-cyan-400 transition-colors">AI Capabilities</a>
+                <a href="#how-it-works" class="hover:text-cyan-400 transition-colors">How It Works</a>
+                <a href="/docs" target="_blank" class="hover:text-cyan-400 transition-colors flex items-center space-x-1">
+                    <span>API Docs</span>
+                    <svg class="w-3.5 h-3.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
+                </a>
+                <a href="/health" target="_blank" class="hover:text-cyan-400 transition-colors flex items-center space-x-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+                    <span>System Health</span>
+                </a>
+            </nav>
+
+            <div>
+                <a href="#get-started" class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg text-white bg-gradient-to-r from-brand-600 to-cyan-600 hover:from-brand-500 hover:to-cyan-500 shadow-lg shadow-brand-600/25 transition-all">
+                    Launch Platform
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow z-10">
+
+        <!-- Hero Section -->
+        <section class="relative pt-16 pb-24 lg:pt-28 lg:pb-36 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
+            <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-800 text-xs text-slate-300 mb-8 backdrop-blur-md">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                <span>Next-Gen Civic Infrastructure</span>
+                <span class="text-slate-500">|</span>
+                <span class="text-cyan-400 font-mono">v{{ version }}</span>
+            </div>
+
+            <h1 class="font-heading text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-[1.15]">
+                Intelligent Civic Issue Reporting & <span class="bg-gradient-to-r from-cyan-400 via-brand-400 to-violet-400 bg-clip-text text-transparent">Automated AI Triage</span>
+            </h1>
+
+            <p class="mt-6 text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
+                Empowering citizens to report municipal problems seamlessly while giving administrative teams real-time AI classification, priority detection, and automated routing.
+            </p>
+
+            <!-- Call to Actions -->
+            <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
+                <div class="w-full sm:w-auto relative group">
+                    <button class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-600 hover:from-brand-500 hover:to-cyan-500 font-semibold text-white shadow-xl shadow-brand-500/25 flex items-center justify-center space-x-2 transition-all transform group-hover:-translate-y-0.5">
+                        <svg class="w-5 h-5 text-cyan-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>Report an Issue</span>
+                    </button>
+                    <span class="badge-upcoming text-[10px] font-mono font-medium px-2 py-0.5 rounded-full absolute -top-3 -right-2 backdrop-blur-md">
+                        Phase 1 Ready
+                    </span>
+                </div>
+
+                <div class="w-full sm:w-auto relative group">
+                    <button class="w-full sm:w-auto px-8 py-4 rounded-xl bg-slate-900/80 hover:bg-slate-800/90 border border-slate-700/70 font-semibold text-slate-200 flex items-center justify-center space-x-2 transition-all backdrop-blur-md transform group-hover:-translate-y-0.5">
+                        <svg class="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        <span>Admin Command Center</span>
+                    </button>
+                    <span class="badge-upcoming text-[10px] font-mono font-medium px-2 py-0.5 rounded-full absolute -top-3 -right-2 backdrop-blur-md">
+                        Phase 2 Ready
+                    </span>
+                </div>
+            </div>
+
+            <!-- Platform Architecture Status Card -->
+            <div id="get-started" class="mt-16 max-w-4xl mx-auto">
+                <div class="glass-panel rounded-2xl p-6 sm:p-8 text-left relative overflow-hidden">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-800/80">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <h3 class="font-heading font-semibold text-lg text-white">Phase 0 System Status</h3>
+                        </div>
+                        <span class="text-xs font-mono text-slate-400">Engine: FastAPI + SQLAlchemy</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
+                        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
+                            <span class="text-xs font-medium text-slate-400 block mb-1">API Backend</span>
+                            <span class="text-sm font-semibold text-emerald-400 flex items-center">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                FastAPI Active
+                            </span>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
+                            <span class="text-xs font-medium text-slate-400 block mb-1">Database Engine</span>
+                            <span class="text-sm font-semibold text-cyan-400 flex items-center">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+                                SQLite Connected
+                            </span>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
+                            <span class="text-xs font-medium text-slate-400 block mb-1">API Documentation</span>
+                            <a href="/docs" target="_blank" class="text-sm font-semibold text-indigo-400 hover:underline flex items-center">
+                                Swagger UI /docs
+                                <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Capabilities Preview Section -->
+        <section id="features" class="py-16 bg-slate-900/40 border-y border-slate-800/60 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="font-heading text-3xl sm:text-4xl font-bold text-white tracking-tight">
+                        How AI Transforms Municipal Response
+                    </h2>
+                    <p class="mt-4 text-slate-400 text-base sm:text-lg">
+                        Traditional civic reporting relies on manual triage and fragmented departments. CivicPulse AI automates intelligence from submission to resolution.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Feature 1 -->
+                    <div class="glass-card rounded-2xl p-6 relative">
+                        <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center mb-5 border border-cyan-500/20">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                        </div>
+                        <h3 class="font-heading text-xl font-bold text-white mb-2">Smart Categorization</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            NLP automatically extracts issue context, classifying reports into Roads, Sanitation, Public Safety, or Electrical departments instantly.
+                        </p>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="glass-card rounded-2xl p-6 relative">
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-5 border border-amber-500/20">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        </div>
+                        <h3 class="font-heading text-xl font-bold text-white mb-2">Priority Prediction</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            Assesses hazard severity, location impact, and public risk metrics to route urgent safety hazards ahead of routine maintenance.
+                        </p>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="glass-card rounded-2xl p-6 relative">
+                        <div class="w-12 h-12 rounded-xl bg-violet-500/10 text-violet-400 flex items-center justify-center mb-5 border border-violet-500/20">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        </div>
+                        <h3 class="font-heading text-xl font-bold text-white mb-2">Multimodal Vision</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            Analyzes photo evidence using Gemini Vision API to verify pothole dimensions, structural damage, or overflowing waste.
+                        </p>
+                    </div>
+
+                    <!-- Feature 4 -->
+                    <div class="glass-card rounded-2xl p-6 relative">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-5 border border-emerald-500/20">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                        </div>
+                        <h3 class="font-heading text-xl font-bold text-white mb-2">Duplicate Clustering</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            Groups duplicate reports from nearby residents into single actionable dispatch tickets, saving administrative overhead.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 border-t border-slate-800/80 py-8 px-4 sm:px-6 lg:px-8 text-slate-500 text-sm">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-2">
+                <span class="font-heading font-semibold text-slate-300">CivicPulse AI</span>
+                <span>— Phase 0 Execution Foundation</span>
+            </div>
+            <div class="flex items-center space-x-6 text-xs text-slate-400">
+                <span>FastAPI Base</span>
+                <span>SQLite Local</span>
+                <a href="/health" class="text-cyan-400 hover:underline">/health</a>
+                <a href="/docs" class="text-indigo-400 hover:underline">/docs</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

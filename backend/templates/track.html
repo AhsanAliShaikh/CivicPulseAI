@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en" class="dark h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Your Complaint — CivicPulse AI</title>
+    <meta name="description" content="Track the status of your civic complaint using your unique complaint ID on CivicPulse AI.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: { 50:'#eef2ff',100:'#e0e7ff',500:'#6366f1',600:'#4f46e5',700:'#4338ca',900:'#312e81' },
+                        civic: { cyan:'#06b6d4', emerald:'#10b981', violet:'#8b5cf6' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .form-input {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #e2e8f0;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+        .form-input::placeholder { color: #475569; }
+
+        #result-panel { display: none; }
+        #error-banner { display: none; }
+        #loading-state { display: none; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .slide-up { animation: slideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+        /* Status badge colours */
+        .badge { display:inline-flex; align-items:center; gap:5px; padding:4px 12px; border-radius:9999px; font-size:0.72rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; }
+        .badge-submitted   { background:rgba(99,102,241,0.12); color:#818cf8; border:1px solid rgba(99,102,241,0.25); }
+        .badge-acknowledged{ background:rgba(6,182,212,0.12);  color:#22d3ee; border:1px solid rgba(6,182,212,0.25); }
+        .badge-assigned    { background:rgba(251,191,36,0.12); color:#fbbf24; border:1px solid rgba(251,191,36,0.25); }
+        .badge-in_progress { background:rgba(245,158,11,0.12); color:#f59e0b; border:1px solid rgba(245,158,11,0.25); }
+        .badge-resolved    { background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.25); }
+        .badge-rejected    { background:rgba(239,68,68,0.12);  color:#f87171; border:1px solid rgba(239,68,68,0.25); }
+        .badge-reopened    { background:rgba(139,92,246,0.12); color:#a78bfa; border:1px solid rgba(139,92,246,0.25); }
+
+        /* Priority dots */
+        .priority-low      { color: #34d399; }
+        .priority-medium   { color: #fbbf24; }
+        .priority-high     { color: #f97316; }
+        .priority-critical { color: #ef4444; }
+
+        /* Timeline */
+        .timeline { position: relative; }
+        .timeline::before {
+            content:''; position:absolute; left:15px; top:8px; bottom:8px;
+            width:2px; background: rgba(99,102,241,0.2); border-radius:4px;
+        }
+        .timeline-item { display:flex; gap:16px; align-items:flex-start; padding-bottom:20px; position:relative; }
+        .timeline-item:last-child { padding-bottom:0; }
+        .timeline-dot {
+            width:32px; height:32px; border-radius:50%; flex-shrink:0;
+            display:flex; align-items:center; justify-content:center;
+            background:rgba(99,102,241,0.15); border:2px solid rgba(99,102,241,0.4);
+            position:relative; z-index:1;
+        }
+        .timeline-dot.latest {
+            background:rgba(16,185,129,0.15); border-color:rgba(16,185,129,0.5);
+        }
+
+        .spinner {
+            width:18px; height:18px;
+            border:2px solid rgba(255,255,255,0.2);
+            border-top-color:#6366f1;
+            border-radius:50%;
+            animation:spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform:rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-full flex flex-col relative overflow-x-hidden">
+
+    <!-- Background Glow -->
+    <div class="glow-background bg-violet-600/15 w-[450px] h-[450px] -top-20 -right-20"></div>
+    <div class="glow-background bg-cyan-600/10 w-[350px] h-[350px] bottom-20 left-0"></div>
+
+    <!-- Navigation -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-slate-950/70 border-b border-slate-800/60">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 via-civic-violet to-civic-cyan p-[2px]">
+                    <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                </div>
+                <span class="font-heading font-bold text-lg tracking-tight text-white">CivicPulse<span class="text-cyan-400">.AI</span></span>
+            </a>
+            <nav class="flex items-center space-x-6 text-sm text-slate-400">
+                <a href="/report" class="hover:text-cyan-400 transition-colors">Report Issue</a>
+                <a href="/docs" target="_blank" class="hover:text-cyan-400 transition-colors">API Docs</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow z-10 py-10 px-4 sm:px-6">
+        <div class="max-w-2xl mx-auto">
+
+            <!-- Page Header -->
+            <div class="mb-8">
+                <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-mono mb-4">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                    <span>Complaint Tracker</span>
+                </div>
+                <h1 class="font-heading text-3xl sm:text-4xl font-bold text-white">Track Your Issue</h1>
+                <p class="mt-2 text-slate-400 text-sm">Enter the unique complaint ID you received when you submitted your issue.</p>
+            </div>
+
+            <!-- Search Form -->
+            <div class="glass-panel rounded-2xl p-6 mb-6">
+                <div class="flex gap-3">
+                    <input
+                        id="track-input"
+                        type="text"
+                        placeholder="e.g. a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                        class="form-input flex-1 rounded-xl px-4 py-3 text-sm font-mono"
+                        autocomplete="off">
+                    <button
+                        id="track-btn"
+                        class="px-6 py-3 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-600 hover:from-brand-500 hover:to-cyan-500 text-white font-semibold text-sm transition-all flex items-center space-x-2 flex-shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <span>Search</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Error Banner -->
+            <div id="error-banner" class="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-400 text-sm flex items-start space-x-3">
+                <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span id="error-message"></span>
+            </div>
+
+            <!-- Loading -->
+            <div id="loading-state" class="flex justify-center py-12">
+                <div class="spinner"></div>
+            </div>
+
+            <!-- Result Panel -->
+            <div id="result-panel" class="slide-up">
+
+                <!-- Complaint Header -->
+                <div class="glass-panel rounded-2xl p-6 mb-4">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex-1 min-w-0 pr-4">
+                            <p class="text-xs text-slate-500 font-mono mb-1" id="res-public-id"></p>
+                            <h2 class="font-heading font-bold text-xl text-white leading-snug" id="res-title"></h2>
+                        </div>
+                        <span id="res-status-badge" class="badge badge-submitted flex-shrink-0"></span>
+                    </div>
+
+                    <!-- Meta grid -->
+                    <div class="grid grid-cols-2 gap-3 mt-4">
+                        <div class="bg-slate-900/50 rounded-xl p-3">
+                            <p class="text-xs text-slate-500 mb-1">Priority</p>
+                            <p class="text-sm font-semibold capitalize" id="res-priority"></p>
+                        </div>
+                        <div class="bg-slate-900/50 rounded-xl p-3">
+                            <p class="text-xs text-slate-500 mb-1">Category</p>
+                            <p class="text-sm font-semibold text-slate-200" id="res-category"></p>
+                        </div>
+                        <div class="bg-slate-900/50 rounded-xl p-3">
+                            <p class="text-xs text-slate-500 mb-1">Submitted</p>
+                            <p class="text-sm font-medium text-slate-300" id="res-created"></p>
+                        </div>
+                        <div class="bg-slate-900/50 rounded-xl p-3">
+                            <p class="text-xs text-slate-500 mb-1">Last Updated</p>
+                            <p class="text-sm font-medium text-slate-300" id="res-updated"></p>
+                        </div>
+                    </div>
+
+                    <!-- Department (if assigned) -->
+                    <div id="res-dept-section" class="mt-3 hidden">
+                        <div class="bg-slate-900/50 rounded-xl p-3 flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500">Assigned Department</p>
+                                <p class="text-sm font-semibold text-indigo-300" id="res-dept-name"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location (if provided) -->
+                    <div id="res-location-section" class="mt-3 hidden">
+                        <div class="bg-slate-900/50 rounded-xl p-3 flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-xs text-slate-500">Location</p>
+                                <p class="text-sm text-slate-300 truncate" id="res-address"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Info (Phase 3+) -->
+                    <div id="res-ai-section" class="mt-3 hidden">
+                        <div class="bg-violet-500/5 border border-violet-500/20 rounded-xl p-3">
+                            <p class="text-xs text-violet-400 font-semibold uppercase tracking-wide mb-2">AI Analysis</p>
+                            <p class="text-sm text-slate-300" id="res-ai-summary"></p>
+                            <div class="flex gap-3 mt-2 text-xs">
+                                <span class="text-slate-500">AI Category: <span id="res-ai-category" class="text-violet-300 font-medium"></span></span>
+                                <span class="text-slate-500">Confidence: <span id="res-ai-confidence" class="text-violet-300 font-medium"></span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="glass-panel rounded-2xl p-6 mb-4">
+                    <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Description</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed" id="res-description"></p>
+                </div>
+
+                <!-- Status Timeline -->
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-5">Status Timeline</h3>
+                    <div class="timeline" id="res-timeline"></div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="z-10 border-t border-slate-800/60 py-6 px-4 text-center text-xs text-slate-500 mt-8">
+        <span class="font-heading font-semibold text-slate-400">CivicPulse AI</span> — Complaint Tracker ·
+        <a href="/report" class="text-cyan-400 hover:underline ml-1">Report New Issue</a> ·
+        <a href="/docs" class="text-indigo-400 hover:underline ml-1" target="_blank">API</a>
+    </footer>
+
+    <script>
+        // -------------------------------------------------------
+        // Pre-fill from URL param
+        // -------------------------------------------------------
+        const urlParams = new URLSearchParams(window.location.search);
+        const preId = urlParams.get('id');
+        if (preId) {
+            document.getElementById('track-input').value = preId;
+            fetchComplaint(preId);
+        }
+
+        // -------------------------------------------------------
+        // Track button
+        // -------------------------------------------------------
+        document.getElementById('track-btn').addEventListener('click', () => {
+            const id = document.getElementById('track-input').value.trim();
+            if (!id) { showError('Please enter a complaint ID.'); return; }
+            fetchComplaint(id);
+        });
+        document.getElementById('track-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') document.getElementById('track-btn').click();
+        });
+
+        async function fetchComplaint(publicId) {
+            hideError();
+            setLoading(true);
+            document.getElementById('result-panel').style.display = 'none';
+
+            try {
+                const resp = await fetch(`/api/v1/complaints/${encodeURIComponent(publicId)}`);
+                const data = await resp.json();
+
+                if (resp.status === 404) {
+                    showError(`No complaint found with ID: ${publicId}`);
+                    return;
+                }
+                if (!resp.ok) {
+                    showError(data.detail || `Error ${resp.status}`);
+                    return;
+                }
+
+                renderComplaint(data);
+            } catch (err) {
+                showError('Network error. Please try again.');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function renderComplaint(c) {
+            // Header
+            document.getElementById('res-public-id').textContent = c.public_id;
+            document.getElementById('res-title').textContent = c.title;
+            document.getElementById('res-description').textContent = c.description;
+
+            // Status badge
+            const badge = document.getElementById('res-status-badge');
+            badge.textContent = c.status.replace('_', ' ');
+            badge.className = `badge badge-${c.status}`;
+
+            // Priority
+            const priorityEl = document.getElementById('res-priority');
+            priorityEl.textContent = c.priority;
+            priorityEl.className = `text-sm font-semibold capitalize priority-${c.priority}`;
+
+            // Category
+            document.getElementById('res-category').textContent = c.category || 'Uncategorised';
+
+            // Timestamps
+            document.getElementById('res-created').textContent = formatDate(c.created_at);
+            document.getElementById('res-updated').textContent = formatDate(c.updated_at);
+
+            // Department
+            const deptSection = document.getElementById('res-dept-section');
+            if (c.department) {
+                document.getElementById('res-dept-name').textContent = `${c.department.name} (${c.department.code})`;
+                deptSection.classList.remove('hidden');
+            } else {
+                deptSection.classList.add('hidden');
+            }
+
+            // Location
+            const locSection = document.getElementById('res-location-section');
+            const locationText = c.address || (c.latitude && c.longitude ? `${c.latitude.toFixed(4)}, ${c.longitude.toFixed(4)}` : null);
+            if (locationText) {
+                document.getElementById('res-address').textContent = locationText;
+                locSection.classList.remove('hidden');
+            } else {
+                locSection.classList.add('hidden');
+            }
+
+            // AI Info
+            const aiSection = document.getElementById('res-ai-section');
+            if (c.ai_summary || c.ai_category) {
+                document.getElementById('res-ai-summary').textContent = c.ai_summary || '—';
+                document.getElementById('res-ai-category').textContent = c.ai_category || '—';
+                document.getElementById('res-ai-confidence').textContent = c.ai_confidence != null ? `${(c.ai_confidence * 100).toFixed(0)}%` : '—';
+                aiSection.classList.remove('hidden');
+            } else {
+                aiSection.classList.add('hidden');
+            }
+
+            // Timeline
+            const timeline = document.getElementById('res-timeline');
+            timeline.innerHTML = '';
+            const history = [...(c.status_history || [])].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            if (history.length === 0) {
+                timeline.innerHTML = '<p class="text-slate-500 text-sm">No status history yet.</p>';
+            } else {
+                history.forEach((entry, idx) => {
+                    const isLatest = idx === history.length - 1;
+                    const icon = isLatest
+                        ? `<svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`
+                        : `<svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg>`;
+
+                    const arrow = entry.old_status
+                        ? `<span class="text-slate-500">${entry.old_status.replace('_',' ')}</span>
+                           <svg class="w-3.5 h-3.5 text-slate-600 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                           <span class="font-semibold badge badge-${entry.new_status} text-[10px]">${entry.new_status.replace('_',' ')}</span>`
+                        : `<span class="font-semibold badge badge-${entry.new_status} text-[10px]">${entry.new_status.replace('_',' ')}</span>`;
+
+                    timeline.innerHTML += `
+                        <div class="timeline-item">
+                            <div class="timeline-dot ${isLatest ? 'latest' : ''}">${icon}</div>
+                            <div class="flex-1 min-w-0 pb-1">
+                                <div class="flex flex-wrap items-center gap-2 mb-1">${arrow}</div>
+                                ${entry.note ? `<p class="text-xs text-slate-400 mt-1">${escapeHtml(entry.note)}</p>` : ''}
+                                <p class="text-[11px] text-slate-600 mt-1">${formatDate(entry.created_at)}</p>
+                            </div>
+                        </div>`;
+                });
+            }
+
+            document.getElementById('result-panel').style.display = 'block';
+        }
+
+        function formatDate(iso) {
+            if (!iso) return '—';
+            return new Date(iso).toLocaleString('en-US', {
+                year:'numeric', month:'short', day:'numeric',
+                hour:'2-digit', minute:'2-digit'
+            });
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function setLoading(loading) {
+            document.getElementById('loading-state').style.display = loading ? 'flex' : 'none';
+        }
+
+        function showError(msg) {
+            document.getElementById('error-message').textContent = msg;
+            document.getElementById('error-banner').style.display = 'flex';
+        }
+
+        function hideError() {
+            document.getElementById('error-banner').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

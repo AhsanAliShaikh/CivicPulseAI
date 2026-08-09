@@ -1,1 +1,1 @@
-notepad main.py
+from backend.main import app as app
